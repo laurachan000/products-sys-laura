@@ -1,0 +1,19 @@
+{
+  "statusCode": 200,
+  "message": "SUCCESS",
+  "recordsRetrieved": 2,
+  "reviews": [
+    { 
+      "user": "kking",
+      "rating": 3.0,
+      "review": "Very cool mug, have used it in many parties.",
+      "createdDate": "2019-07-22" 
+    },
+    {
+      "user": "ghughlett",
+      "rating": 4.0,
+      "review": "Best mug ever, never leave home without it",
+      "createdDate": "2019-07-21" 
+    }
+  ]
+}

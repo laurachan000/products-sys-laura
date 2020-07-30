@@ -1,0 +1,138 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/2c641c51-cd89-4769-ab01-1f9b94e37da2/ # 
+title: EC-Store-Products-Sys-Api
+description: Reference API for the Store as a Service system layer which exposes the methods and resources to obtain products and detaill, inventory available, price and reviews of products
+version: v1 
+
+#######################################################################
+# WHO  WHEN      WHY
+# EC   23-12-19  Initial API EC-Store-Products-Sys-Api
+#######################################################################
+
+types:
+  product: !include dataTypes/product.raml
+  productDetail: !include dataTypes/productDetail.raml
+  productPatch: !include dataTypes/productPatch.raml
+  price: !include dataTypes/price.raml
+  inventory: !include dataTypes/inventory.raml
+  review: !include dataTypes/review.raml
+
+
+traits:
+  hasCorrelationId: !include traits/hasCorrelationId.raml
+  hasClientIdRequired: !include traits/hasClientId.raml 
+  hasErrorResponses: !include exchange_modules/f2ea2cb4-c600-4bb5-88e8-e952ff5591ee/util-fragment/1.0.1/error-responses-trait.raml
+
+
+/products:
+  is: [hasCorrelationId, hasClientIdRequired, hasErrorResponses]
+  get:
+    description: Search for products based on name, summary and/or manufacturer.
+    queryParameters:
+      query:
+        description: Part or all of the name summary or manufacturer.
+        minLength: 3
+        type: string
+        example: Xbox
+    responses:
+      200:
+        body:
+          application/json:
+            type: product
+            example: !include examples/product/productsGetResponse.json
+  
+  /{id}:
+    is: [hasCorrelationId, hasClientIdRequired, hasErrorResponses]
+    get:
+      description: Return product detail.
+      responses:
+        200:
+          body:
+            application/json:
+              type: productDetail
+              example: !include examples/product/productGetResponse.json
+    patch:
+        description: Update average rating and total ratings.
+        body:
+          application/json:
+            type: productPatch
+            example: !include examples/product/productPatchRequest.json
+        responses:
+          200:
+            body:
+              application/json:
+                type: productPatch
+                example: !include examples/product/productPatchResponse.json
+    
+    /inventory:
+      is: [hasCorrelationId, hasClientIdRequired, hasErrorResponses]
+      get:
+        description: Return inventory available.
+        responses:
+          200:
+            body:
+              application/json:
+                type: inventory
+                example: !include examples/inventory/inventoryGetResponse.json
+
+      patch:
+        description: Update inventory.
+        body:
+          application/json:
+            type: inventory
+            example: !include examples/inventory/inventoryPatchRequest.json
+        responses:
+          200:
+            body:
+              application/json:
+                type: inventory
+                example: !include examples/inventory/inventoryPatchResponse.json
+
+
+    /pricing:
+      is: [hasCorrelationId, hasClientIdRequired, hasErrorResponses]
+      get:
+        description: Return product price.
+        responses:
+          200:
+            body:
+              application/json:
+                type: price
+                example: !include examples/price/priceGetResponse.json
+
+    /reviews:
+      is: [hasCorrelationId, hasClientIdRequired, hasErrorResponses]
+      get:
+        description: Get top 3 product reviews.
+        queryParameters:
+          nbrOfReviews:
+            description: Numbers of reviews.
+            type: number
+            default: 3
+            example: 3
+            required: false
+        responses:
+          200:
+            body:
+              application/json:
+                type: review
+                example: !include examples/review/reviewsGetResponse.json
+          404:
+            body:
+              application/json:
+                example: 
+                  message: There are no product reviews presently.
+
+      post:
+        description: Add new review.
+        body:
+          application/json:
+            type: review
+            example: !include examples/review/reviewAddRequest.json
+        responses:
+          201:
+            body:
+              application/json:
+                type: review
+                example: !include examples/review/reviewAddResponse.json
+       

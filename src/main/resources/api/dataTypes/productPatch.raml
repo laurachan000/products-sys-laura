@@ -1,0 +1,16 @@
+#%RAML 1.0 DataType
+description: Update averageRating and totalRatings of a product
+type: object
+properties:
+  productId:
+    type: integer
+    required: false
+    example: 801
+  averageRating:
+    type: number
+    example: 3.75
+    required: false
+  totalRatings:
+    type: number
+    example: 4
+    required: false

@@ -1,0 +1,31 @@
+#%RAML 1.0 DataType
+description: Reviews of a product
+type: object
+properties:
+  id:
+    type: integer
+    required: false
+    example: 11
+  productId:
+    type: integer
+    required: false
+    example: 10
+  user:
+    type: string
+    example: "adolan"
+    required: false
+  rating:
+    type: number
+    minimum: 0
+    maximum: 5
+    example: 2
+    required: false
+  review:
+    type: string
+    example: "Sometimes I don't know why I buy things."
+    minLength: 5
+    required: false
+  createdDate:
+    type: string
+    required: false
+    example: 2019-07-22

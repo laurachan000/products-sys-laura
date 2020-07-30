@@ -1,0 +1,19 @@
+{
+  "statusCode": 200,
+  "message": "SUCCESS",
+  "productDetail": {
+    "productId": 1,
+    "name" : "GoPro Camera",
+    "summary" : "Who doesn't want video of everything.",
+    "manufacturer" : "GoPro",
+    "description" : "A camera",
+    "dimensions" : "1x3x5",
+    "weight" : 3.5,
+    "asin" : "1000ABC-DEF",
+    "model" : "v3",
+    "averageRating" : 4.0,
+    "totalRatings" : 2
+  }
+}
+
+

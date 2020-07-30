@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+    <apikit:config name="Router" api="ec-store-as-a-service-products-sys-api.raml" raml="api/ec-store-as-a-service-products-sys-api.raml" outboundHeadersMapName="outboundHeadersMapName" httpStatusVarName="httpStatus" />
+    <flow name="ec-store-as-a-service-products-sys-api" doc:id="5b0c8f29-edb5-4e9c-846a-d7cd1155876a">
+        <http:listener doc:name="Listener" doc:id="de8ededc-4b53-4eb6-8f88-2bbd2365868c" config-ref="HTTP_Listener_config" path="${http.router.path}/*">
+            <http:response statusCode="#[vars.httpStatus default 200]" />
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+        </http:listener>
+        <set-variable variableName="headerAttributes" value="#[%dw 2.0 output application/java --- {  correlationId: attributes.headers.correlation_id default uuid(),  clientSecret: attributes.headers.client_secret default &quot;&quot;,  clientId: attributes.headers.client_id default &quot;&quot;  }]" doc:name="headerAttributes" doc:id="6a4a7030-7662-46c3-b09a-5a0ad49570a1" />
+        <set-variable value="apikit::main" doc:name="currentFlow" doc:id="71ca0f7d-93b4-4b00-bb41-5a53673649de" variableName="currentFlow" />
+        <logger level="INFO" doc:name="Logger" doc:id="c4d4c48e-945f-4489-817d-89a1e2e97c97" message="#[message]" category="${log.cat}"/>
+		<apikit:router doc:name="APIkit Router" doc:id="09d251bd-e421-4a11-a09e-ef397c4cbb87" config-ref="Router" />
+    </flow>
+    <flow name="ec-store-as-a-service-products-sys-api-console" doc:id="d3700381-5fb5-400d-bd70-1708bfd7117d">
+        <http:listener doc:name="Listener" doc:id="d9733d00-388a-47be-9a74-fefe43e507eb" config-ref="HTTP_Listener_config" path="/console/*" />
+        <apikit:console doc:name="APIkit Console" doc:id="4b4e5ee4-e38e-4b40-b245-78e303759c3c" config-ref="Router" />
+    </flow>
+</mule>

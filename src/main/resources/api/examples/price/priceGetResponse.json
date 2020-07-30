@@ -1,0 +1,10 @@
+{
+  "statusCode": 200,
+  "message": "SUCCESS",
+  "pricingDetail": {
+    "price": 23.50,
+    "currency": "USD"
+  }
+}
+  
+

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<flow name="patch:\products\(id)\inventory:application\json:Router">
+		<set-variable value="products-main::impl-patch-inventory" doc:name="currentFlow" doc:id="4579014a-478b-4df6-af01-0b8cc0261f61" variableName="currentFlow"/>
+		<flow-ref doc:name="impl-patch-inventory" doc:id="bdb5f21f-945e-46fd-9201-448abdcac8f0" name="impl-patch-inventory"/>
+	</flow>
+	<flow name="patch:\products\(id):application\json:Router">
+		<set-variable value="products-main::impl-patch-product" doc:name="currentFlow" doc:id="c0f3edc6-b918-4f94-94f8-8621d38d953c" variableName="currentFlow"/>
+		<flow-ref doc:name="impl-patch-product" doc:id="f481a8e9-d1fd-43f9-9103-f44b516ceb2d" name="impl-patch-product"/>
+	</flow>
+	<flow name="post:\products\(id)\reviews:application\json:Router">
+		<set-variable value="products-main::impl-post-review" doc:name="currentFlow" doc:id="b6972ca3-103b-4b45-b733-ab5ee3d31d8d" variableName="currentFlow"/>
+		<flow-ref doc:name="impl-post-review" doc:id="38a131e6-d407-4cd6-916d-bb298120cc0a" name="impl-post-review"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b498b470-c684-4b3c-81ed-2b7147ce0eb3" message="END post-products-id-reviews: #[payload]" category="${log.dog}"/>
+	</flow>
+	<flow name="get:\products\(id)\inventory:Router">
+		<set-variable value="products-main::impl-get-inventory" doc:name="currentFlow" doc:id="7aa5ef1f-8323-4a30-8e72-4e41eb69252b" variableName="currentFlow"/>
+		<flow-ref doc:name="impl-get-inventory" doc:id="dd0bf5b5-6ffe-453f-9f6b-4b9cdecffed9"
+			name="impl-get-inventory" />
+	</flow>
+	<flow name="get:\products\(id)\pricing:Router">
+		<set-variable value="products-main::impl-get-price-detail" doc:name="currentFlow" doc:id="161df53f-3f9e-45c6-a7fb-ce9437732ecb" variableName="currentFlow"/>
+		<flow-ref doc:name="impl-get-price-detail" doc:id="5b5a6d44-8e62-475d-b3ed-492131de328d"
+			name="impl-get-price-detail" />
+
+	</flow>
+	<flow name="get:\products:Router">
+		<set-variable value="products-main::impl-get-products" doc:name="currentFlow" doc:id="6895cdba-c78e-401b-96cf-8689254f1076" variableName="currentFlow"/>
+		<flow-ref doc:name="impl-get-products" doc:id="6eadbfda-4000-427a-bec6-9f68aaa3dfa3"
+			name="impl-get-products" />
+	</flow>
+	<flow name="get:\products\(id)\reviews:Router">
+		<set-variable value="products-main::impl-get-reviews" doc:name="currentFlow" doc:id="fa235268-349c-40bf-bf61-c29342984193" variableName="currentFlow"/>
+		<flow-ref doc:name="impl-get-reviews" doc:id="b0854a0a-d1f8-4398-9b46-f4aa5106321f"
+			name="impl-get-reviews" />
+	</flow>
+	<flow name="get:\products\(id):Router">
+		<set-variable value="products-main::impl-get-product" doc:name="currentFlow" doc:id="060a5da2-1bba-41f2-ab92-631518e1ec76" variableName="currentFlow"/>
+		<flow-ref doc:name="impl-get-product" doc:id="c2d106aa-91eb-4443-a7ed-aa1f7fb3815e"
+			name="impl-get-product" />
+	</flow>
+</mule>

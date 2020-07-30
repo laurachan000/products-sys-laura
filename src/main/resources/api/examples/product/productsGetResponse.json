@@ -1,0 +1,20 @@
+{
+  "statusCode": 200,
+  "message": "SUCCESS",
+  "productsFound": [ 
+    {
+      "productId" : 100,
+      "name" : "Yeti Mug",
+      "summary" : "A very nice looking mug.",
+      "manufacturer" : "Yeti",
+      "averageRating": 4.0
+    }, 
+    {
+      "productId" : 101,
+      "name" : "Amazon FireStick",
+      "summary" : "A new way to watch TV.",
+      "manufacturer" : "Amazon",
+      "averageRating": 3.4
+    }
+  ]
+}

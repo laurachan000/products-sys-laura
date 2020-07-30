@@ -1,0 +1,8 @@
+{
+  "statusCode": 200,
+  "message": "SUCCESS",
+  "inventoryDetail": {
+    "productId" : 10,
+    "inventoryAvailable" : 100
+  }  
+}

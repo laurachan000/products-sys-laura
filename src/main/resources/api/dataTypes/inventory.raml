@@ -1,0 +1,17 @@
+#%RAML 1.0 DataType
+description: Product Inventory Available
+type: object
+properties:
+  id:
+    type: integer
+    required: false
+    example: 801
+  productId:
+    type: integer
+    required: false
+    example: 801
+  inventoryAvailable:
+    type: integer
+    minimum: 0
+    example: 8
+    required: false

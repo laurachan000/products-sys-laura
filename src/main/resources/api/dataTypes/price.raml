@@ -1,0 +1,29 @@
+#%RAML 1.0 DataType
+description: Price of a product 
+type: object
+properties:
+  id:
+    type: integer
+    example: 11
+    required: false
+  productId:
+    type: integer
+    example: 10
+    required: false
+  price:
+    type: number
+    minimum: 1
+    example: 8.25
+    required: false
+  currency:
+    type: string
+    enum:
+     - USD
+     - EUR
+    example: USD
+    required: false
+  asOfDate:
+    type: string
+    example: 23-12-2019
+    required: false
+

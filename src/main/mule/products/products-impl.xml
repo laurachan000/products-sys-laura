@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
+	xmlns:avio-core="http://www.mulesoft.org/schema/mule/avio-core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/avio-core http://www.mulesoft.org/schema/mule/avio-core/current/mule-avio-core.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<sub-flow name="impl-get-products" doc:id="ba28b490-48d4-4a66-b01e-2e395c58ee03" >
+		<logger level="INFO" doc:name="Log START" doc:id="41d33e05-e85f-4145-85ab-52cf19a0e59e" 
+			category="${log.dog}" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;START flow impl-get-products&quot;
+}]"/>
+		<mongo:find-documents doc:name="Find products" doc:id="655423ac-9cd0-4451-9ece-d314785f2166" config-ref="MongoDB_Config" collectionName="products">
+			<mongo:condition-query ><![CDATA[#["{\$text: { \$search: '" ++ attributes.queryParams.query as String ++ "'}}"]]]></mongo:condition-query>
+		</mongo:find-documents>
+		<set-payload value="#[%dw 2.0
+output application/json
+var products = payload
+---
+{
+  statusCode: p('http.get.statusCode'),
+  message: p('http.get.message'),
+  productsFound: products map ( product, index ) -&gt; {
+	  productId: product.product_id,
+      name: product.name,
+      summary: product.summary,
+      manufacturer: product.manufacturer,
+      averageRating: product.average_rating
+  }
+}]" doc:name="Set Payload" doc:id="7ae2b20a-ae2e-4403-b899-a5477a9fc915" />
+		<logger level="INFO" doc:name="Log END" doc:id="e9f808b3-e558-467f-b323-1badfbaa614d"
+			category="${log.dog}" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;END flow impl-get-product&quot;
+}]"/>
+	</sub-flow>
+	
+	<sub-flow name="impl-get-product" doc:id="be1def0e-eb70-45d7-a9d7-3907ed630d53" >
+		<logger level="INFO" doc:name="Log START" doc:id="f3cc0ffd-a23b-4453-ab1a-52e110c18cc6"
+		 	category="${log.dog}" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;START flow impl-get-product&quot;
+}]"/>
+		<mongo:find-one-document doc:name="Find one document" doc:id="a212c624-c4f1-46e7-93c1-6a7169b45a69" config-ref="MongoDB_Config" collectionName="products">
+			<mongo:find-query><![CDATA[#["{product_id: " ++ attributes.uriParams.id as Number ++ "}"]]]></mongo:find-query>
+		</mongo:find-one-document>
+		<set-payload value="#[%dw 2.0
+output application/json
+var product = payload
+---
+{
+  statusCode: p('http.get.statusCode'),
+  message: p('http.get.message'),
+  productDetail: {
+    productId: product.product_id,
+    name: product.name,
+    summary: product.summary,
+    manufacturer: product.manufacturer,
+    description: product.description,
+    dimensions: product.dimensions,
+    weight: product.weight,
+    asin: product.asin,
+    model: product.model,
+    averageRating: product.average_rating,
+    totalRatings: product.total_ratings
+  }
+}]" doc:name="Set Payload" doc:id="98c9d681-19dd-4f53-a7f9-95354e905e78" />
+		<logger level="INFO" doc:name="Log END" doc:id="8dceb5ba-d505-4029-8763-759250bcfefa"
+			category="${log.dog}" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;END flow impl-get-product&quot;
+}]"/>
+	</sub-flow>
+	
+	<sub-flow name="impl-get-reviews" doc:id="1cc34167-6055-462f-8ce3-62c7144a628b" >
+		<logger level="INFO" doc:name="Log START" doc:id="2caa02ff-69fc-4305-bff6-df5fe25ab07e" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;START flow impl-get-reviews&quot;
+}]" category="${log.dog}"/>
+		<set-variable value='#["{product_id: " ++ attributes.uriParams.id ++ "}"]' doc:name="reviewQuery" doc:id="7696a3b6-847d-45ab-8579-7544b40e1145" variableName="reviewQuery"/>
+		<set-variable value='#["{rating: -1}"]' doc:name="reviewSort" doc:id="5bebfd48-a237-4bc7-a815-57c623623c25" variableName="reviewSort"/>
+		<mongo:find-documents collectionName="product_reviews" doc:name="Find documents" doc:id="4b1ebc4d-5610-4052-99ba-40965a6805be" config-ref="MongoDB_Config" resultLimit="#[attributes.queryParams.nbrOfReviews as Number]">
+			<mongo:condition-query ><![CDATA[#[vars.reviewQuery]]]></mongo:condition-query>
+			<mongo:sort-by ><![CDATA[#[vars.reviewSort]]]></mongo:sort-by>
+		</mongo:find-documents>
+		<set-payload value="#[%dw 2.0
+output application/json
+var reviews = payload
+---
+{
+	statusCode: p('http.get.statusCode'),
+	message: p('http.get.message'),
+	recordsRetrieved: sizeOf(reviews),
+	reviews: reviews map ( productReview, index ) -&gt; {
+		user: productReview.user,
+		rating: productReview.rating,
+		review: productReview.review,
+		createdDate: productReview.created_date as String {format: &quot;yyyy-MM-dd&quot;}
+	}
+}]" doc:name="Set Payload" doc:id="6bbc9801-85b5-4ccd-a0cf-ed7fda81519a" />
+		<logger level="INFO" doc:name="Log END" doc:id="74ed0369-efd5-4c0a-801a-1665f26d21bc" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;END flow impl-get-reviews&quot;
+}]" category="${log.dog}"/>
+	</sub-flow>
+	
+	<sub-flow name="impl-get-price-detail" doc:id="87663683-b7b9-4a6d-8824-c2b8b56a7083">
+		<logger level="INFO" doc:name="Log START" doc:id="d9e80c4b-7c56-4fcc-b9e7-a7c3f4df53a6" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;START flow impl-get-price-detail&quot;
+}]" category="${log.dog}"/>
+		<db:select doc:name="Select Pricing" doc:id="b19cb50a-8c78-42a8-9427-471022b3176c" config-ref="Database_Config">
+			<db:sql >SELECT BC.PRODUCT_ID, BC.PRICE, BC.CURRENCY
+FROM BC_STORE.BC_PRODUCT_PRICING as BC 
+WHERE BC.PRODUCT_ID = :product_id
+			</db:sql>
+			<db:input-parameters ><![CDATA[#[{product_id: attributes.uriParams.id}]]]></db:input-parameters>
+		</db:select>
+		<set-payload value="#[%dw 2.0
+output application/json
+var price = payload[0]
+---
+{
+  statusCode: p('http.get.statusCode'),
+  message: p('http.get.message'),
+  pricingDetail:  {
+    price: price.PRICE,
+    currency: price.CURRENCY
+  }
+}]" doc:name="Set Payload" doc:id="5f1b986c-8108-43f1-b4e3-855bb141ec66" />
+		<logger level="INFO" doc:name="Log START" doc:id="b86ac9ed-40f9-4b98-bb89-95a32d407933" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;END flow impl-get-price-detail&quot;
+}]" category="${log.dog}"/>
+	</sub-flow>
+	
+	<sub-flow name="impl-get-inventory" doc:id="f178f998-2ee9-4e54-b2df-7f6923c005eb" >
+		<logger level="INFO" doc:name="Log START" doc:id="2ff4b9c3-59d4-432e-a75e-091d63596dfe" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;START flow impl-get-inventory&quot;
+}]" category="${log.dog}"/>
+		<db:select doc:name="Select Inventory" doc:id="156cc606-e4de-403e-8078-288b1f7a5f04" config-ref="Database_Config">
+			<db:sql >SELECT BC.PRODUCT_ID, BC.QUANTITY_AVAILABLE
+FROM BC_STORE.BC_PRODUCT_INVENTORY as BC 
+WHERE BC.PRODUCT_ID = :product_id</db:sql>
+			<db:input-parameters ><![CDATA[#[{product_id: attributes.uriParams.id}]]]></db:input-parameters>
+		</db:select>
+		<set-payload value="#[%dw 2.0
+output application/json
+var inventory = payload[0]
+---
+{
+  statusCode: p('http.get.statusCode'),
+  message: p('http.get.message'),
+  inventoryDetail: {
+    productId: inventory.PRODUCT_ID,
+    inventoryAvailable: inventory.QUANTITY_AVAILABLE
+  }
+}]" doc:name="Set Payload" doc:id="306c2c5f-0f63-40ae-8f73-1318fefefab8" />
+		<logger level="INFO" doc:name="Log END" doc:id="a80bca98-6e39-4e11-bf65-785c33201402" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;END flow impl-get-inventory&quot;
+}]" category="${log.dog}"/>
+	</sub-flow>
+	
+	<sub-flow name="impl-post-review" doc:id="ed9b12f5-b555-467c-8633-37729ba29365">
+		<logger level="INFO" doc:name="Log START" doc:id="1c086200-2ead-452f-9012-d4b3cd1bc963" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;START flow impl-post-review&quot;
+}]" category="${log.dog}"/>
+		<mongo:insert-document collectionName="product_reviews" doc:name="Insert document" doc:id="d1c9044b-1b27-4a93-b34e-ff55a58946e2" config-ref="MongoDB_Config">
+			<mongo:document ><![CDATA[#[%dw 2.0
+output application/json
+var review = payload.productReview
+---
+{
+	product_id: attributes.uriParams.id as Number,
+	user: review.user default "",
+    rating: review.rating default 0,
+    review: review.review default "",
+    created_date: now() as String {format: 'yyyy-MM-dd'}
+}]]]></mongo:document>
+		</mongo:insert-document>
+		<mongo:find-one-document doc:name="Find one document" doc:id="51a51107-e791-457c-92b1-73d8b2752df6" config-ref="MongoDB_Config" collectionName="product_reviews">
+			<mongo:find-query><![CDATA[#["{_id: ObjectId('" ++ payload ++ "')}"]]]></mongo:find-query>
+		</mongo:find-one-document>
+		<set-payload value="#[%dw 2.0
+output application/json
+var review = payload
+---
+{
+  statusCode: p('http.get.statusCode'),
+  message: p('http.get.message'),
+  recordsAdded: 1,
+  reviewAdded: {
+    user: review.user,
+    rating: review.rating,
+    review: review.review,
+    createdDate: review.created_date
+  }
+}]" doc:name="Set Payload" doc:id="d2780f24-ae25-4312-9a19-3f23c307f5b3" />
+		<logger level="INFO" doc:name="Log END" doc:id="c224ff12-bd72-4bbb-b0f9-9f6af21f012a" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;END flow impl-post-review&quot;
+}]" category="${log.dog}"/>
+	</sub-flow>
+	
+	<sub-flow name="impl-patch-product" doc:id="56865ddf-308b-4050-808f-e5c8f592b649" >
+		<logger level="INFO" doc:name="Log START" doc:id="45aba496-c71d-459f-9693-d3ddc45cf02d" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;START flow impl-patch-product&quot;
+}]" category="${log.dog}"/>
+		<set-variable value="#[attributes.uriParams.id]" doc:name="ID" doc:id="4fa59365-b3f2-4c67-aff6-d8f7b3ec8453" variableName="ID"/>
+		<set-variable value="#[%dw 2.0
+output application/json
+var product = payload.product
+---
+{
+	averageRating: product.averageRating,
+	totalRatings: product.totalRatings
+}]" doc:name="product" doc:id="c5ae3842-9002-4760-88b4-50b59220b4e9" variableName="product"/>
+		<mongo:update-documents collectionName="products" doc:name="Update documents" doc:id="70ea40d2-191d-440b-8dc9-5534253428dd" config-ref="MongoDB_Config">
+			<mongo:find-query ><![CDATA[#["{product_id:" ++ vars.ID ++ "}"]]]></mongo:find-query>
+			<mongo:content-to-update ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	average_rating: vars.product.averageRating as Number, 
+	total_ratings: vars.product.totalRatings  as Number
+}]]]></mongo:content-to-update>
+		</mongo:update-documents>
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+{
+  &quot;statusCode&quot;: p('http.get.statusCode'),
+  &quot;message&quot;: p('http.get.message'),
+  &quot;productUpdated&quot;: {
+    &quot;productId&quot;: vars.ID,
+    &quot;averageRating&quot;: vars.product.averageRating,
+    &quot;totalRatings&quot;: vars.product.totalRatings
+  }
+}]" doc:name="Set Payload" doc:id="5a42f267-c4d3-4a00-ad97-4dba47833031" />
+		<logger level="INFO" doc:name="Log END" doc:id="80eb9262-9b00-452a-a8e1-3fec407b20f2" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;END flow impl-patch-product&quot;
+}]" category="${log.dog}"/>
+	</sub-flow>
+	
+	<sub-flow name="impl-patch-inventory" doc:id="1a91863b-b04b-4eee-89ff-30a49d189f6f" >
+		<logger level="INFO" doc:name="Log START" doc:id="df7d265d-1e32-41c4-92e6-ce2868c2e5ea" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;START flow impl-patch-inventory&quot;
+}]" category="${log.dog}"/>
+		<set-variable value="#[attributes.uriParams.id]" doc:name="ID" doc:id="43257448-cdd9-463b-bc4b-71cfcf9a32e1" variableName="ID"/>
+		<set-variable value="#[payload.product.inventoryAvailable]" doc:name="newQuantity" doc:id="2a378bd2-35cd-4293-973e-84e8cb4ddd26" variableName="newQuantity"/>
+		<choice doc:name="Choice" doc:id="f2d65870-a2cb-420d-8b82-13fa026243a6" >
+			<when expression="#[vars.newQuantity &gt; 0]">
+				<db:update doc:name="Update Inventory" doc:id="85387569-0da8-463c-be09-07894aa51800" config-ref="Database_Config">
+			<db:sql>UPDATE BC_PRODUCT_INVENTORY 
+SET QUANTITY_AVAILABLE = :quantityRemaining, AS_OF_DATE = :newDate
+WHERE PRODUCT_ID = :product_id</db:sql>
+			<db:input-parameters><![CDATA[#[{
+	product_id: vars.ID, 
+	quantityRemaining: vars.newQuantity,
+	newDate: now() as String {format:"yyyy/MM/dd HH:mm:ss"}
+}]]]></db:input-parameters>
+		</db:update>
+			</when>
+			<otherwise >
+				<db:update doc:name="Update status_cd" doc:id="74352c5d-f9c7-4fbc-88c7-99afa6ff2378" config-ref="Database_Config">
+					<db:sql >UPDATE BC_PRODUCT_INVENTORY 
+SET STATUS_CD = :status, AS_OF_DATE = :newDate
+WHERE PRODUCT_ID = :product_id</db:sql>
+					<db:input-parameters ><![CDATA[#[{
+	product_id: vars.ID, 
+	status: "NOT_AVAILABLE",
+	newDate: now() as String {format:"yyyy/MM/dd HH:mm:ss"}
+}]]]></db:input-parameters>
+				</db:update>
+			</otherwise>
+		</choice>
+		<set-payload value="#[%dw 2.0
+output application/json
+---
+{
+  &quot;statusCode&quot;: p('http.get.statusCode'),
+  &quot;message&quot;: p('http.get.message'),
+  &quot;inventoryDetail&quot;: {
+    &quot;productId&quot; : vars.ID,
+    &quot;inventoryAvailable&quot; : vars.newQuantity
+  }  
+}]" doc:name="Set Payload" doc:id="408c6f27-13fe-4a05-9bd2-30cdd24b7e7a" />
+		<logger level="INFO" doc:name="Log END" doc:id="c045a648-7ce1-4fa4-8eb9-ddbd94fe5d51" message="#[%dw 2.0
+output application/json
+---
+{
+  correlationID: correlationId,
+  flowName: vars.currentFlow,
+  apiVersion: p('api.version'),
+  apiId: p('api.apiId'),
+  apiName: p('api.name'),
+  message: &quot;END flow impl-patch-inventory&quot;
+}]" category="${log.dog}"/>
+	</sub-flow>
+</mule>

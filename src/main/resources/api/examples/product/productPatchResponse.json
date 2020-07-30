@@ -1,0 +1,9 @@
+{
+  "statusCode": 200,
+  "message": "SUCCESS",
+  "productUpdated": {
+    "productId": 1,
+    "averageRating": 2.4,
+    "totalRatings": 5
+  }
+}

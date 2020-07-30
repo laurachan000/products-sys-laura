@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="products-impl-test-suite.xml" />
+	<munit:test name="products-impl-get-products-test" doc:id="b378dc18-4210-4035-89e4-ad1b9da00783" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when Find Documents" doc:id="e1fccd49-a07e-41ae-a25f-87e52d900cb8" processor="mongo:find-documents">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Find products" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json
+---
+[{
+"product_id" : 1.0, 
+    "name" : "XPS 13", 
+    "manufacturer" : "Dell", 
+    "summary" : "Dell XPS 13 9370 13.3 FHD InfinityEdge - 8th Gen Intel Core i5 - 8GB Memory - 128GB SSD - Intel UHD Graphics 620 - Rose Gold", 
+    "description" : "Dell XPS 13", 
+    "dimensions" : "7.8 x 11.9 x 0.3 inches", 
+    "weight" : 2.4, 
+    "weight_uom" : "lb", 
+    "asin" : "B078MKCPKH", 
+    "model" : "XPS9370-5033GLD-PUS", 
+    "average_rating" : 1.3, 
+    "total_ratings" : 2.5, 
+    "image_url" : "https://images-na.ssl-images-amazon.com/images/I/71P%2BvbmKucL._SL1280_.jpg", 
+    "status_cd" : "ACTIVE"}]]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="query queryParam" doc:id="55b123b1-b6d3-4518-8ce0-6a33816f1def" >
+				<munit:attributes value="#[{queryParams: {'query' : 'XPS'}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="impl-get-products" doc:id="0a9d451c-da99-49c5-b3f0-4c99de1455f3" name="impl-get-products"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that Not Null" doc:id="7b60b4e5-9c53-4ae1-99fe-3423f2dfdcba" is="#[MunitTools::notNullValue()]" message="NOT null" expression="#[payload.productsFound]"/>
+			<logger level="DEBUG" doc:name="payload" doc:id="f9e7d100-a692-4f9a-ab4a-67c7b7fec89d" message="#[payload]" category="${log.cat}"/>
+			<munit-tools:assert-that doc:name="Assert that payload content" doc:id="db2741c6-40ff-4cd1-9bcf-afae5d1b56e2" is="#[MunitTools::startsWith('XPS')]" message="content startsWith XPS" expression="#[payload.productsFound[0].name]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="products-impl-get-product-test" doc:id="3741de92-bb21-475c-bd76-2e87d58ef0c7" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when Find Product" doc:id="5576f843-767f-457c-a125-ff150b5cd2fc" processor="mongo:find-one-document">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Find one document" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/json
+---
+{
+	"product_id" : 1, 
+    "name" : "XPS 13", 
+    "manufacturer" : "Dell", 
+    "summary" : "Dell XPS 13 9370 13.3 FHD InfinityEdge - 8th Gen Intel Core i5 - 8GB Memory - 128GB SSD - Intel UHD Graphics 620 - Rose Gold", 
+    "description" : "Dell XPS 13", 
+    "dimensions" : "7.8 x 11.9 x 0.3 inches", 
+    "weight" : 2.4, 
+    "weight_uom" : "lb", 
+    "asin" : "B078MKCPKH", 
+    "model" : "XPS9370-5033GLD-PUS", 
+    "average_rating" : 1.3, 
+    "total_ratings" : 2.5, 
+    "image_url" : "https://images-na.ssl-images-amazon.com/images/I/71P%2BvbmKucL._SL1280_.jpg", 
+    "status_cd" : "ACTIVE"
+}]' mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set ID" doc:id="c5fa2035-7c99-4e6e-b163-c5c5d220b708" >
+				<munit:attributes value="#[{uriParams: {'id': 1}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="impl-get-product" doc:id="8d90e18f-117c-48ba-8689-79ea20531908" name="impl-get-product"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that NOT null" doc:id="3c613443-d0c7-4f06-9f9a-3e4732824e3b" message="NOT null" expression="#[payload.productDetail]" is="#[MunitTools::notNullValue()]"/>
+			<logger level="DEBUG" doc:name="payload" doc:id="77602b76-76f6-4389-ab94-a1d53cc28e59" message="#[payload]" category="${log.cat}"/>
+			<munit-tools:assert-that doc:name="Assert that payload content" doc:id="d01245a2-4b99-4a5f-8b87-78f50a419bab" message='"product_id = 1"' expression="#[payload.productDetail.productId]" is="#[MunitTools::equalTo(1)]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="products-impl-get-reviews-test" doc:id="64f034b1-4789-4afc-a19f-67eebc700969" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when Find Reviews" doc:id="5ee1011c-afec-4128-b245-c356b5934c63" processor="mongo:find-documents">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product_reviews" attributeName="collectionName" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json
+---
+[{ 
+    &quot;product_id&quot; : 1.0, 
+    &quot;user&quot; : &quot;jhorrible1985&quot;, 
+    &quot;rating&quot; : 1.0, 
+    &quot;review&quot; : &quot;Horrible product, do not buy this piece of ____&quot;, 
+    &quot;created_date&quot; : &quot;2019-07-21&quot;
+},
+{ 
+    &quot;product_id&quot; : 1.0, 
+    &quot;user&quot; : &quot;tsoso1982&quot;, 
+    &quot;rating&quot; : 2.0, 
+    &quot;review&quot; : &quot;Does the job, that's all I can say&quot;, 
+    &quot;created_date&quot; : &quot;2019-07-21&quot;
+}]]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set ID" doc:id="400ca042-333e-46c5-bc37-037d8f2a2122" >
+				<munit:attributes value="#[{uriParams: {'id': 1}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="impl-get-reviews" doc:id="33195e62-6f78-417d-9f8b-9e81bbefbce8" name="impl-get-reviews"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that NOT null" doc:id="5bd17d1d-1c4a-4b9c-8741-6e546dc4145f" is="#[MunitTools::notNullValue()]" message="NOT null" expression="#[payload.reviews]"/>
+			<logger level="DEBUG" doc:name="payload" doc:id="fe5065a7-6db2-4c46-9cf7-860c42850c45" message="#[payload]" category="${log.cat}"/>
+			<munit-tools:assert-that doc:name="Assert that SIZE = 2" doc:id="ac08743e-1817-432e-85ee-7f3cabd1e7c9" is="#[MunitTools::equalTo(2)]" message='"SIZE = 2"' expression="#[payload.recordsRetrieved]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="products-impl-get-price-detail-test" doc:id="5c400ffb-e306-40f8-8f46-da9f5ff8e88e" description="Test">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when Select Pricing" doc:id="ad239fb6-0271-497b-8841-32f32ef7c03e" processor="db:select">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="Select Pricing" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/java
+---
+[{
+	PRODUCT_ID: 3,
+	PRICE: 3.03,
+	CURRENCY: "USD",
+}]]' mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:name="Set ID" doc:id="37401a8c-0e3c-48c1-8cbc-c2f792be82a9">
+				<munit:attributes value="#[{uriParams: {'id': 1}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="impl-get-price-detail" doc:id="8439334c-ac91-4833-862c-a2433325b5f0" name="impl-get-price-detail" />
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that NOT null" doc:id="e9aa0d35-9f88-4c1b-821f-bb7d16d39bd4" message="NOT null" expression="#[payload]" is="#[MunitTools::notNullValue()]" />
+			<logger level="DEBUG" doc:name="payload" doc:id="d4c4de65-4a77-45ba-83a4-f8c3d59cdb6c" message="#[payload]" category="${log.cat}" />
+			<munit-tools:assert-that doc:name="Assert that payload content" doc:id="0ec5af17-cfcd-4eac-8c6f-7e125d4e3d64" message="content containsString SUCCESS" expression="#[payload.message]" is="#[MunitTools::containsString('SUCCESS')]" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="products-impl-get-inventory-test" doc:id="a53d3be0-c177-472c-b530-c659957398d0" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when Select Inventory" doc:id="5b0d1033-0a86-4c07-9f49-a7b8e7e44193" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select Inventory" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json
+---
+[{
+   PRODUCT_ID: 1,
+   QUANTITY_AVAILABLE: 10
+}]]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set ID" doc:id="0fcaa045-7b3a-4ffa-9ba8-b6f9adf0d3c9" >
+				<munit:attributes value="#[{uriParams:{'id': 1}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="impl-get-inventory" doc:id="e2b38df3-0f77-474e-a49c-b8be29191823" name="impl-get-inventory"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that NOT null" doc:id="2f9d4359-fcff-47c5-a54d-a27c49718cc9" is="#[MunitTools::notNullValue()]" message="NOT null" expression="#[payload.inventoryDetail]"/>
+			<logger level="DEBUG" doc:name="payload" doc:id="e0d1592f-db59-4ea5-a1e0-0f9ff181f849" message="#[payload]" category="${log.cat}"/>
+			<munit-tools:assert-that doc:name="Assert that product_id = 1" doc:id="0f59fec7-3142-4180-ab40-41567e67ca7e" is="#[MunitTools::equalTo(1)]" message='"product_id = 1"' expression="#[payload.inventoryDetail.productId]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="products-impl-post-review-test" doc:id="b2c37802-eb09-4d62-9956-a077f14c3cd1" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when Add Review" doc:id="f6514fd4-1dee-494e-9788-bf6c5cd5d67d" processor="mongo:insert-document">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="product_reviews" attributeName="collectionName" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json
+---
+{
+ &quot;productReview&quot;: {
+	product_id: 1,
+	user: &quot;ecruz&quot;,
+    rating: 2,
+    review: &quot;Not working&quot;,
+    created_date: '2020-01-14'
+}}]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when Show Review" doc:id="e8a94fbe-41c7-4ec8-bb75-1e2657df75c4" processor="mongo:find-one-document">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Find one document" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json
+---
+{
+ 	user: &quot;ecruz&quot;,
+    rating: 2,
+    review: &quot;not working&quot;,
+    createdDate: '2020-01-14'
+}]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set ID" doc:id="398b5186-4ed0-41ac-97e6-3aa7254d5782" />
+			<flow-ref doc:name="impl-post-review" doc:id="9f2ba788-8c21-40b9-846b-14aa84075e16" name="impl-post-review"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that NOT null" doc:id="e691fe47-90ab-4233-a985-20781546be31" message="NOT null" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+			<logger level="DEBUG" doc:name="payload" doc:id="a8b19425-7049-40eb-b409-e47ce799f5fb" message="#[payload]" category="${log.cat}"/>
+			<munit-tools:assert-that doc:name="Assert that payload content" doc:id="aaf3905a-248b-4aea-8396-bf27315a9684" message="content containsString ecruz" expression="#[payload.reviewAdded.user]" is="#[MunitTools::containsString('ecruz')]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="products-impl-patch-product-test" doc:id="5f43f635-67d6-4e78-ae9d-9cf808633f42" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when Update Product" doc:id="df54189f-2f63-426e-94ab-48cdb77a218e" processor="mongo:update-documents">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="products" attributeName="collectionName" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json
+---
+[{
+	average_rating: 10,
+	total_ratings: 15
+}]]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set ID" doc:id="9095b954-fc6c-48cf-bc10-4ef3bb3e9df8" >
+				<munit:payload value="#[{uriParams:{'id': 1}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="impl-patch-product" doc:id="dafe2a0b-ddca-4ae2-aebe-d0c6a7474cf7" name="impl-patch-product"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that NOT null" doc:id="f32cb89e-b55c-4520-8e9d-d2cea6feaa8e" is="#[MunitTools::notNullValue()]" message="NOT null" expression="#[payload]"/>
+			<logger level="DEBUG" doc:name="payload" doc:id="62d5b52f-9a84-4644-96f7-93accec9925c" message="#[payload]" category="${log.cat}"/>
+			<munit-tools:assert-that doc:name="Assert that payload content" doc:id="930053b3-01a3-470c-9c1f-afb14820b8a9" is="#[MunitTools::containsString('SUCCESS')]" message='payload content' expression="#[payload.message]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="product-impl-patch-inventory-test" doc:id="93e385d7-ff4f-426f-88d4-550f5d5d68be" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when Update Inventory" doc:id="d12aabcd-83b6-45d3-b505-ec7a5a7a9fbd" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Update Inventory" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java
+---
+[{
+	product_id: 1, 
+	quantityRemaining: 10
+}]]" mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set ID" doc:id="7f8c0acf-c805-407f-9127-ece3eceec093" >
+				<munit:payload value='{"quantityOrder": 3}' mediaType="application/json" />
+				<munit:attributes value="#[{uriParams: {'id': 1}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="impl-patch-inventory" doc:id="370996cd-7ea2-4571-96de-116346383f36" name="impl-patch-inventory"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that NOT null" doc:id="1c21e6d7-ddde-4040-8804-e0f5d31bf138" is="#[MunitTools::notNullValue()]" message="NOT null" expression="#[payload]"/>
+			<logger level="DEBUG" doc:name="payload" doc:id="1646d6b3-254c-494b-bdcb-2a9fcd3b29b4" message="#[payload]" category="${log.cat}"/>
+			<munit-tools:assert-that doc:name="Assert that payload content" doc:id="dcc3c602-3356-4699-93a8-75d8eaddd673" is="#[MunitTools::containsString('SUCCESS')]" message='payload content' expression="#[payload.message]"/>
+		</munit:validation>
+	</munit:test>
+
+</mule>

@@ -1,0 +1,10 @@
+{
+  "statusCode": 201,
+  "message": "SUCCESS",
+  "recordsAdded": 1,
+  "reviewAdded": {
+    "user" : "ecruz",
+    "rating" : 1.3,
+    "review" : "The product is smaller than you describe it."
+  }
+}
